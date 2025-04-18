@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Chat with AI Models</title>
+  <!-- Include Puter.js from their CDN -->
+  <script src="https://js.puter.com/v2/"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f0f0f0;
+      padding: 20px;
+    }
+    #chat-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+    #model-select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+    #chat-box {
+      display: flex;
+      margin-bottom: 15px;
+    }
+    #chat-input {
+      flex-grow: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px 0 0 4px;
+      outline: none;
+    }
+    #send-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: 1px solid #007bff;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
+      outline: none;
+    }
+    #chat-output {
+      max-height: 300px;
+      overflow-y: auto;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+    .user, .ai {
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 4px;
+    }
+    .user {
+      background: #d1e7dd;
+      text-align: right;
+    }
+    .ai {
+      background: #f8d7da;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <h1>Chat with AI Model</h1>
+    <!-- Dropdown to select the model -->
+    <select id="model-select">
+      <option value="gpt-4o">GPT-4o</option>
+      <option value="gpt-4o-mini">GPT-4o-mini</option>
+      <option value="o1">o1</option>
+      <option value="o1-mini">o1-mini</option>
+      <option value="o1-pro">o1-pro</option>
+      <option value="o3">o3</option>
+      <option value="o3-mini">o3-mini</option>
+      <option value="o4-mini">o4-mini</option>
+      <option value="gpt-4.1">GPT-4.1</option>
+      <option value="gpt-4.1-mini">GPT-4.1-mini</option>
+      <option value="gpt-4.1-nano">GPT-4.1-nano</option>
+      <option value="gpt-4.5-preview">GPT-4.5-preview</option>
+    </select>
+    
+    <!-- Chat input area -->
+    <div id="chat-box">
+      <input type="text" id="chat-input" placeholder="Type your message here..." />
+      <button id="send-btn">Send</button>
+    </div>
+    
+    <!-- Chat output container -->
+    <div id="chat-output"></div>
+  </div>
+
+  <script>
+    // Get DOM elements
+    const modelSelect = document.getElementById("model-select");
+    const chatInput = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("send-btn");
+    const chatOutput = document.getElementById("chat-output");
+
+    // Function to append messages to the chat window.
+    function appendMessage(content, sender = 'ai') {
+      const messageElement = document.createElement("div");
+      messageElement.classList.add(sender);
+      messageElement.innerHTML = content;
+      chatOutput.appendChild(messageElement);
+      chatOutput.scrollTop = chatOutput.scrollHeight; // Ensure the latest message is visible.
+    }
+
+    // Send button click event handler
+    sendBtn.addEventListener("click", async () => {
+      const userMessage = chatInput.value.trim();
+      if (!userMessage) return;
+
+      // Append the user's message
+      appendMessage("<strong>You:</strong> " + userMessage, "user");
+
+      // Get the model the user selected
+      const selectedModel = modelSelect.value;
+
+      // Clear the input
+      chatInput.value = '';
+
+      try {
+        // Make the API call with the selected model
+        const response = await puter.ai.chat(userMessage, { model: selectedModel }, testMode=false);
+        appendMessage("<strong>" + selectedModel + ":</strong> " + response, "ai");
+      } catch (error) {
+        appendMessage("<strong>Error:</strong> " + error.message, "ai");
+      }
+    });
+
+    // Allow sending the message using the Enter key
+    chatInput.addEventListener("keyup", (event) => {
+      if (event.key === "Enter") {
+        sendBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>
